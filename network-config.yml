@@ -1,0 +1,71 @@
+Parameters:
+  EnvironmentName:
+    Description: Environment Name for Web App project
+    Type: String
+  
+  VpcCIDR:
+    Description: IP range for Vpc CIDr
+    Type: String
+    Default: 10.0.0.0/16
+
+  Private1CIDR:
+    Description: IP range for Private1 Subnet CIDR
+    Type: String
+    Default: 10.0.0.0/24
+
+  Private2CIDR:
+    Description: IP range for pribate2 Subnet CIDR
+    Type: String
+    Default: 10.0.1.0/24
+
+Resources:
+
+  #Create a VPC first where all your instances will live -
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: !Ref VpcCIDR
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  #Create two Private Subnets in two AZs- 
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Private1CIDR
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+      - Key: Name
+        Value: !Sub ${EnvironmentName}-Private1
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Private2CIDR
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+      - Key: Name
+        Value: !Sub ${EnvironmentName}-Private1
+
+Outputs:
+  VPC:
+    Description: Name of VPC
+    Value: !Ref VPC
+    Export:
+      Name: !Sub ${EnvironmentName}-VPCID
+
+  Private1Subnet:
+    Description: Private Subnet1
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: !Sub ${EnvironmentName}-PRI1
+
+  Private2Subnet:
+    Description: Private Subnet2
+    Value: !Ref PrivateSubnet2
+    Export:
+      Name: !Sub ${EnvironmentName}-PRI2
+

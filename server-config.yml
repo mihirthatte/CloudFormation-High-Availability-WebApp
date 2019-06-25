@@ -1,0 +1,16 @@
+Resources:
+  #Create a launch configuration - It creates a template for Auto Scaling group
+  #to launch instance based on scaling rules.launch Config tell how the new instances
+  #should be created and their specifications.
+  LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      AssociatePublicIpAddress: true
+      ImageId: ami-005bdb005fb00e791
+      InstanceType: t2.medium
+      BlockDeviceMappings: 
+        - DeviceName: "/dev/sda1"
+          Ebs: 
+          VolumeSize: "10"
+          VolumeType: "io1"
+          Iops: 200
