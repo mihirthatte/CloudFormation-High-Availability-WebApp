@@ -1,8 +1,36 @@
+Parameters:
+  EnvironmentName:
+    Description: Environment Name for Web App project
+    Type: String
+
 Resources:
+
+  ServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http and ssh on port 80 and 22 respectively and allow all outbound traffic
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+
   #Create a launch configuration - It creates a template for Auto Scaling group
   #to launch instance based on scaling rules.launch Config tell how the new instances
   #should be created and their specifications.
-  LaunchConfig:
+  ServerLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       AssociatePublicIpAddress: true
@@ -11,6 +39,14 @@ Resources:
       BlockDeviceMappings: 
         - DeviceName: "/dev/sda1"
           Ebs: 
-          VolumeSize: "10"
-          VolumeType: "io1"
-          Iops: 200
+            VolumeSize: "10"
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          wget -P ../../var/www/html https://s3.us-east-2.amazonaws.com/test-udagram-1/index.html
+      SecurityGroups:
+      - Ref: ServerSecGroup
