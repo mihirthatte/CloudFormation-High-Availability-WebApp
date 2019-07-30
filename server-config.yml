@@ -4,29 +4,6 @@ Parameters:
     Type: String
 
 Resources:
-
-  ServerSecGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow http and ssh on port 80 and 22 respectively and allow all outbound traffic
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
-        CidrIp: 0.0.0.0/0
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
-
   #Create a launch configuration - It creates a template for Auto Scaling group
   #to launch instance based on scaling rules.launch Config tell how the new instances
   #should be created and their specifications.
@@ -51,7 +28,7 @@ Resources:
           wget -P ../../var/www/html https://s3.us-east-2.amazonaws.com/test-udagram-1/index.html
       SecurityGroups:
       - Ref: ServerSecGroup
-  
+
   #Create a Target group -
   WebAppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -68,17 +45,48 @@ Resources:
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
 
-  WebAppLB:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
+  #Create a security group for load balancer - 
+  ServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      Listeners:
-        - LoadBalancerPort: '80'
-          InstancePort: '80'
-          Protocol: HTTP
-      HealthCheck:
-        Target: HTTP:80/
-        HealthyThreshold: '3'
-        UnhealthyThreshold: '5'
-        Interval: '30'
-        Timeout: '5'
+      GroupDescription: Allow http and ssh on port 80 and 22 respectively and allow all outbound traffic
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+
+  WebAppLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
       Subnets:
+        - Fn::ImportValue:
+            !Sub "${EnvironmentName}-PUB1"
+        - Fn::ImportValue:
+            !Sub "${EnvironmentName}-PUB2"
+      SecurityGroups:
+        - !Ref ServerSecGroup
+
+  WebAppLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - WebAppLB
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref WebAppTargetGroup
+          Type: 'forward'
+      LoadBalancerArn: !Ref WebAppLB
+      Port: 80
+      Protocol: HTTP
