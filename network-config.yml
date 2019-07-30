@@ -81,6 +81,20 @@ Resources:
       - Key: Name
         Value: !Sub ${EnvironmentName}-Private1
 
+  #Attaching internet Gateway to Public subnet
+  WebAppInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  IGatewayAttach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref WebAppInternetGateway
+      VpcId: !Ref VPC
+
 Outputs:
   VPC:
     Description: Name of VPC
@@ -111,3 +125,9 @@ Outputs:
     Value: !Ref PublicSubnet2
     Export:
       Name: !Sub ${EnvironmentName}-PUB2
+
+  WebAppInternetGateway:
+    Description: Internet Gatway
+    Value: !Ref WebAppInternetGateway
+    Export:
+      Name: !Sub ${EnvironmentName}-IG
