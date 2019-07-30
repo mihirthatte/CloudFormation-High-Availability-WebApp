@@ -35,7 +35,7 @@ Resources:
     Properties:
       AssociatePublicIpAddress: true
       ImageId: ami-005bdb005fb00e791
-      KeyName: "CFProjectKey.pem"
+      KeyName: "CFProjectKey"
       InstanceType: t2.medium
       BlockDeviceMappings: 
         - DeviceName: "/dev/sda1"
@@ -67,3 +67,18 @@ Resources:
       VpcId: 
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
+
+  WebAppLB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      Listeners:
+        - LoadBalancerPort: '80'
+          InstancePort: '80'
+          Protocol: HTTP
+      HealthCheck:
+        Target: HTTP:80/
+        HealthyThreshold: '3'
+        UnhealthyThreshold: '5'
+        Interval: '30'
+        Timeout: '5'
+      Subnets:

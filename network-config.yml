@@ -18,6 +18,15 @@ Parameters:
     Type: String
     Default: 10.0.1.0/24
 
+  Public1CIDR:
+    Description: IP range for pribate2 Subnet CIDR
+    Type: String
+    Default: 10.0.2.0/24
+
+  Public2CIDR:
+    Description: IP range for pribate2 Subnet CIDR
+    Type: String
+    Default: 10.0.3.0/24
 Resources:
 
   #Create a VPC first where all your instances will live -
@@ -28,6 +37,28 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref EnvironmentName
+
+  #Create two public Subnets in two AZs-
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Public1CIDR
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+      - Key: Name
+        Value: !Sub ${EnvironmentName}-Public1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Public2CIDR
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+      - Key: Name
+        Value: !Sub ${EnvironmentName}-Public2
+
 
   #Create two Private Subnets in two AZs- 
   PrivateSubnet1:
@@ -69,3 +100,14 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-PRI2
 
+  Public1Subnet:
+    Description: Public Subnet1
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: !Sub ${EnvironmentName}-PUB1
+
+  Public2Subnet:
+    Description: Public Subnet2
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: !Sub ${EnvironmentName}-PUB2
