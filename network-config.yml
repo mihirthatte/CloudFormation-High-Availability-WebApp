@@ -1,35 +1,36 @@
-Parameters:
-  EnvironmentName:
-    Description: Environment Name for Web App project
-    Type: String
-  
-  VpcCIDR:
-    Description: IP range for Vpc CIDr
-    Type: String
-    Default: 10.0.0.0/16
+#Parameters:
+#  EnvironmentName:
+#    Description: Environment Name for Web App project
+#    Type: String
+#  
+#  VpcCIDR:
+#    Description: IP range for Vpc CIDr
+#    Type: String
+#    Default: 10.0.0.0/16
+#
+#  Private1CIDR:
+#    Description: IP range for Private1 Subnet CIDR
+#    Type: String
+#    Default: 10.0.0.0/24
+#
+#  Private2CIDR:
+#    Description: IP range for private2 Subnet CIDR
+#    Type: String
+#    Default: 10.0.1.0/24
+#
+#  Public1CIDR:
+#    Description: IP range for public1 Subnet CIDR
+#    Type: String
+#    Default: 10.0.2.0/24
+#
+#  Public2CIDR:
+#    Description: IP range for public2 Subnet CIDR
+#    Type: String
+#    Default: 10.0.3.0/24
 
-  Private1CIDR:
-    Description: IP range for Private1 Subnet CIDR
-    Type: String
-    Default: 10.0.0.0/24
-
-  Private2CIDR:
-    Description: IP range for pribate2 Subnet CIDR
-    Type: String
-    Default: 10.0.1.0/24
-
-  Public1CIDR:
-    Description: IP range for pribate2 Subnet CIDR
-    Type: String
-    Default: 10.0.2.0/24
-
-  Public2CIDR:
-    Description: IP range for pribate2 Subnet CIDR
-    Type: String
-    Default: 10.0.3.0/24
 Resources:
 
-  #Create a VPC first where all your instances will live -
+  # - Create a Virtual Public Cloud where all subnets & instances will live -
   VPC:
     Type: AWS::EC2::VPC
     Properties: 
@@ -38,7 +39,10 @@ Resources:
         - Key: Name
           Value: !Ref EnvironmentName
 
-  #Create two public Subnets in two AZs-
+  # - Create two public Subnets in two AZs
+  # - These public subnets will be used for creating Load Balanced
+  #   traffic. All EC2 instances will be in Private Subnet and a load
+  #   balancer residing in public subnet will talk to those instances.
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -79,7 +83,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs '']
       Tags:
       - Key: Name
-        Value: !Sub ${EnvironmentName}-Private1
+        Value: !Sub ${EnvironmentName}-Private2
 
   #Attaching internet Gateway to Public subnet
   WebAppInternetGateway:

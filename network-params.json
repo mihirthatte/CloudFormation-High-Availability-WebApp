@@ -14,5 +14,13 @@
   {
     "ParameterKey": "Private2CIDR",
     "ParameterValue": "10.0.1.0/24"
+  },
+  {
+    "ParameterKey": "Public1CIDR",
+    "ParameterValue": "10.0.2.0/24"
+  },
+  {
+    "ParameterKey": "Public2CIDR",
+    "ParameterValue": "10.0.3.0/24"
   }
 ]

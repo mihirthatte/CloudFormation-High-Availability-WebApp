@@ -90,3 +90,5 @@ Resources:
       LoadBalancerArn: !Ref WebAppLB
       Port: 80
       Protocol: HTTP
+
+  #Finally create a auto scaling group to launch your EC2 instances - 
