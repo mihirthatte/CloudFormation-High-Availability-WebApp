@@ -98,40 +98,40 @@ Outputs:
     Description: Name of VPC
     Value: !Ref VPC
     Export:
-      Name: !Sub ${EnvironmentName}-VPCID
+      Name: !Sub ${AWS::StackName}-VPCID
 
   Private1Subnet:
     Description: Private Subnet1
     Value: !Ref PrivateSubnet1
     Export:
-      Name: !Sub ${EnvironmentName}-PRI1
+      Name: !Sub ${AWS::StackName}-PRI1
 
   Private2Subnet:
     Description: Private Subnet2
     Value: !Ref PrivateSubnet2
     Export:
-      Name: !Sub ${EnvironmentName}-PRI2
+      Name: !Sub ${AWS::StackName}-PRI2
 
   Public1Subnet:
     Description: Public Subnet1
     Value: !Ref PublicSubnet1
     Export:
-      Name: !Sub ${EnvironmentName}-PUB1
+      Name: !Sub ${AWS::StackName}-PUB1
 
   Public2Subnet:
     Description: Public Subnet2
     Value: !Ref PublicSubnet2
     Export:
-      Name: !Sub ${EnvironmentName}-PUB2
+      Name: !Sub ${AWS::StackName}-PUB2
 
   WebAppInternetGateway:
     Description: Internet Gatway
     Value: !Ref WebAppInternetGateway
     Export:
-      Name: !Sub ${EnvironmentName}-IG
+      Name: !Sub ${AWS::StackName}-IG
 
   IGatewayAttach:
     Description: Internet Gatway Attachment Resource
     Value: !Ref IGatewayAttach
     Export:
-      Name: !Sub ${EnvironmentName}-IGAttach
+      Name: !Sub ${AWS::StackName}-IGAttach

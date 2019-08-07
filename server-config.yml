@@ -1,9 +1,31 @@
 Parameters:
-  EnvironmentName:
-    Description: Environment Name for Web App project
+  NetworkStack:
+    Description: Name of an active Web App Network Stack that contains the networking resource
     Type: String
 
 Resources:
+  ServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http and ssh on port 80 and 22 respectively and allow all outbound traffic
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${NetworkStack}-VPCID"
+
   #Create a launch configuration - It creates a template for Auto Scaling group
   #to launch instance based on scaling rules.launch Config tell how the new instances
   #should be created and their specifications.
@@ -27,7 +49,8 @@ Resources:
           systemctl enable httpd
           wget -P ../../var/www/html https://s3.us-east-2.amazonaws.com/test-udagram-1/index.html
       SecurityGroups:
-      - Ref: ServerSecGroup
+        - !Ref ServerSecGroup
+    DependsOn: ServerSecGroup
 
   #Create a Target group -
   WebAppTargetGroup:
@@ -43,7 +66,7 @@ Resources:
       UnhealthyThresholdCount: 5
       VpcId: 
         Fn::ImportValue:
-          Fn::Sub: "${EnvironmentName}-VPCID"
+          !Sub "${NetworkStack}-VPCID"
 
   #Create a security group for load balancer - 
   ServerSecGroup:
@@ -66,16 +89,16 @@ Resources:
         CidrIp: 0.0.0.0/0
       VpcId:
         Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+          !Sub "${NetworkStack}-VPCID"
 
   WebAppLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Subnets:
         - Fn::ImportValue:
-            !Sub "${EnvironmentName}-PUB1"
+            !Sub "${NetworkStack}-PUB1"
         - Fn::ImportValue:
-            !Sub "${EnvironmentName}-PUB2"
+            !Sub "${NetworkStack}-PUB2"
       SecurityGroups:
         - !Ref ServerSecGroup
 
@@ -91,14 +114,19 @@ Resources:
       Port: 80
       Protocol: HTTP
 
-  #Finally create an auto scaling group to launch your EC2 instances - 
+  #Finally create an auto scaling group to launch your EC2 instances -
   WebAppAutoScale:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      AutoScalingGroupName: !Sub ${EnvironmentName}-AutoScale
+      AutoScalingGroupName: !Sub ${NetworkStack}-AutoScale
       AvailabilityZones:
-        - !Select [0, !GetAZs ''] 
-        - !Select [1, !GetAZs ''] 
+        - !Select [0, !GetAZs '']
+        - !Select [1, !GetAZs '']
+      VPCZoneIdentifier:
+        - Fn::ImportValue:
+            !Sub "${NetworkStack}-PUB1" #Change it to private
+        - Fn::ImportValue:
+            !Sub "${NetworkStack}-PUB2" #Change it to private
       LaunchConfigurationName:
         !Ref ServerLaunchConfig
       TargetGroupARNs:
@@ -107,3 +135,10 @@ Resources:
       MaxSize: "4"
       DesiredCapacity: "4"
       HealthCheckGracePeriod: 180
+
+Outputs:
+  LoadBalancer:
+    Description: Public URL of Load Balancer
+    Value: !Ref WebAppLB
+    Export:
+      Name: !Sub ${NetworkStack}-LB

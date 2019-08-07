@@ -1,6 +1,6 @@
 [
-  {
-    "ParameterKey": "EnvironmentName",
-    "ParameterValue": "UdacityWebApp"
+ {
+    "ParameterKey": "NetworkStack",
+    "ParameterValue": "WebAppNetworkStack"
   }
 ]
