@@ -29,7 +29,6 @@
 #    Default: 10.0.3.0/24
 
 Resources:
-
   # - Create a Virtual Public Cloud where all subnets & instances will live -
   VPC:
     Type: AWS::EC2::VPC
@@ -135,3 +134,9 @@ Outputs:
     Value: !Ref WebAppInternetGateway
     Export:
       Name: !Sub ${EnvironmentName}-IG
+
+  IGatewayAttach:
+    Description: Internet Gatway Attachment Resource
+    Value: !Ref IGatewayAttach
+    Export:
+      Name: !Sub ${EnvironmentName}-IGAttach

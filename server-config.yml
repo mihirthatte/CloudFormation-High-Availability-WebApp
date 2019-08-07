@@ -91,4 +91,15 @@ Resources:
       Port: 80
       Protocol: HTTP
 
-  #Finally create a auto scaling group to launch your EC2 instances - 
+  #Finally create an auto scaling group to launch your EC2 instances - 
+  #WebAppAutoScale:
+  #  Type: AWS::AutoScaling::AutoScalingGroup
+  #  Properties:
+  #    AutoScalingGroupName:
+  #      Fn::Importvalue:ImportValue"
+  #        !Sub "${EnvironmentName}-AutoScale"
+  #    AvailabilityZones:
+  #      - !Select [0, !GetAZs ''] 
+  #      - !Select [1, !GetAZs ''] 
+  #    DesiredCapacity: "4"
+  #    HealthCheckGracePeriod: 180
