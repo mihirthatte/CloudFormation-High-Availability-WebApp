@@ -1,32 +1,27 @@
-#Parameters:
-#  EnvironmentName:
-#    Description: Environment Name for Web App project
-#    Type: String
-#  
-#  VpcCIDR:
-#    Description: IP range for Vpc CIDr
-#    Type: String
-#    Default: 10.0.0.0/16
-#
-#  Private1CIDR:
-#    Description: IP range for Private1 Subnet CIDR
-#    Type: String
-#    Default: 10.0.0.0/24
-#
-#  Private2CIDR:
-#    Description: IP range for private2 Subnet CIDR
-#    Type: String
-#    Default: 10.0.1.0/24
-#
-#  Public1CIDR:
-#    Description: IP range for public1 Subnet CIDR
-#    Type: String
-#    Default: 10.0.2.0/24
-#
-#  Public2CIDR:
-#    Description: IP range for public2 Subnet CIDR
-#    Type: String
-#    Default: 10.0.3.0/24
+Parameters:
+  EnvironmentName:
+    Description: Environment Name for Web App project
+    Type: String
+
+  VpcCIDR:
+    Description: IP range for Vpc CIDR
+    Type: String
+
+  Private1CIDR:
+    Description: IP range for Private1 Subnet CIDR
+    Type: String
+
+  Private2CIDR:
+    Description: IP range for private2 Subnet CIDR
+    Type: String
+
+  Public1CIDR:
+    Description: IP range for public1 Subnet CIDR
+    Type: String
+
+  Public2CIDR:
+    Description: IP range for public2 Subnet CIDR
+    Type: String
 
 Resources:
   # - Create a Virtual Public Cloud where all subnets & instances will live -
