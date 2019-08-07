@@ -92,14 +92,18 @@ Resources:
       Protocol: HTTP
 
   #Finally create an auto scaling group to launch your EC2 instances - 
-  #WebAppAutoScale:
-  #  Type: AWS::AutoScaling::AutoScalingGroup
-  #  Properties:
-  #    AutoScalingGroupName:
-  #      Fn::Importvalue:ImportValue"
-  #        !Sub "${EnvironmentName}-AutoScale"
-  #    AvailabilityZones:
-  #      - !Select [0, !GetAZs ''] 
-  #      - !Select [1, !GetAZs ''] 
-  #    DesiredCapacity: "4"
-  #    HealthCheckGracePeriod: 180
+  WebAppAutoScale:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub ${EnvironmentName}-AutoScale
+      AvailabilityZones:
+        - !Select [0, !GetAZs ''] 
+        - !Select [1, !GetAZs ''] 
+      LaunchConfigurationName:
+        !Ref ServerLaunchConfig
+      TargetGroupARNs:
+        - !Ref WebAppTargetGroup
+      MinSize: "1"
+      MaxSize: "4"
+      DesiredCapacity: "4"
+      HealthCheckGracePeriod: 180
