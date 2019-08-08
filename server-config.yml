@@ -130,6 +130,10 @@ Resources:
 Outputs:
   LoadBalancer:
     Description: Public URL of Load Balancer
-    Value: !Ref WebAppLB
+    Value: 
+      Fn::Join:
+        - ""
+        - - "http://"
+          - Fn::GetAtt: WebAppLB.DNSName
     Export:
       Name: !Sub ${NetworkStack}-LB
