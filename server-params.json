@@ -1,6 +1,18 @@
 [
- {
+  {
     "ParameterKey": "NetworkStack",
     "ParameterValue": "WebAppNetworkStack"
+  },
+  {
+    "ParameterKey": "AutoScaleMinSize",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "AutoScaleMaxSize",
+    "ParameterValue": "4"
+  },
+  {
+    "ParameterKey": "AutoScaleDesiredSize",
+    "ParameterValue": "4"
   }
 ]

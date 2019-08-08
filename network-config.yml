@@ -120,6 +120,11 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet2
+
+
+  # To Do - 
+  # - Add a Nat Gatewat
+  # - Add a private route
 Outputs:
   VPC:
     Description: Name of VPC

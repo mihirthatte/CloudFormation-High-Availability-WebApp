@@ -3,20 +3,32 @@ Parameters:
     Description: Name of an active Web App Network Stack that contains the networking resource
     Type: String
 
+  AutoScaleMinSize:
+    Description: Minimum number of instances
+    Type: String
+
+  AutoScaleMaxSize:
+    Description: Maximum number of instances
+    Type: String
+
+  AutoScaleDesiredSize:
+    Description: Desired number of instances
+    Type: String
+
 Resources:
   ServerSecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow http and ssh on port 80 and 22 respectively and allow all outbound traffic
+      GroupDescription: Allow http and ssh on port 80 and allow all outbound traffic
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
+      #- IpProtocol: tcp
+      #  FromPort: 22
+      #  ToPort: 22
+      #  CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 0
@@ -34,7 +46,7 @@ Resources:
     Properties:
       AssociatePublicIpAddress: true
       ImageId: ami-005bdb005fb00e791
-      KeyName: "CFProjectKey"
+      #KeyName: "CFProjectKey"
       InstanceType: t2.medium
       BlockDeviceMappings: 
         - DeviceName: "/dev/sda1"
@@ -103,16 +115,16 @@ Resources:
         - !Select [1, !GetAZs '']
       VPCZoneIdentifier:
         - Fn::ImportValue:
-            !Sub "${NetworkStack}-PUB1" #Change it to private
+            !Sub "${NetworkStack}-PRI1" #Change it to private
         - Fn::ImportValue:
-            !Sub "${NetworkStack}-PUB2" #Change it to private
+            !Sub "${NetworkStack}-PRI2" #Change it to private
       LaunchConfigurationName:
         !Ref ServerLaunchConfig
       TargetGroupARNs:
         - !Ref WebAppTargetGroup
-      MinSize: "1"
-      MaxSize: "4"
-      DesiredCapacity: "4"
+      MinSize: !Ref AutoScaleMinSize 
+      MaxSize: !Ref AutoScaleMaxSize
+      DesiredCapacity: !Ref AutoScaleDesiredSize
       HealthCheckGracePeriod: 180
 
 Outputs:
