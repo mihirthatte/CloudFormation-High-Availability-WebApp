@@ -43,11 +43,13 @@ Resources:
       UserData: 
         Fn::Base64: !Sub |
           #!/bin/bash
-          yum update -y
-          yum install -y httpd
-          systemctl start httpd
-          systemctl enable httpd
-          wget -P ../../var/www/html https://s3.us-east-2.amazonaws.com/test-udagram-1/index.html
+          apt-get update -y
+          apt-get install unzip awscli -y
+          apt-get install apache2 -y
+          systemctl start apache2.service
+          cd /var/www/html
+          aws s3 cp s3://udacity-demo-1/udacity.zip .
+          unzip -o udacity.zip
       SecurityGroups:
         - !Ref ServerSecGroup
     DependsOn: ServerSecGroup
@@ -65,29 +67,6 @@ Resources:
       Protocol: HTTP
       UnhealthyThresholdCount: 5
       VpcId: 
-        Fn::ImportValue:
-          !Sub "${NetworkStack}-VPCID"
-
-  #Create a security group for load balancer - 
-  ServerSecGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow http and ssh on port 80 and 22 respectively and allow all outbound traffic
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
-        CidrIp: 0.0.0.0/0
-      VpcId:
         Fn::ImportValue:
           !Sub "${NetworkStack}-VPCID"
 
