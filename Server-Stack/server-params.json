@@ -14,5 +14,9 @@
   {
     "ParameterKey": "AutoScaleDesiredSize",
     "ParameterValue": "4"
+  },
+  {
+    "ParameterKey": "IAMProfile",
+    "ParameterValue": "web-app-role"
   }
 ]
