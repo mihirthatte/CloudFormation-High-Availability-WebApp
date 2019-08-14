@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "EnvironmentName",
-    "ParameterValue": "UdacityWebApp"
+    "ParameterValue": "MihirWebApp"
   },
   {
     "ParameterKey": "VpcCIDR",

@@ -1,10 +1,11 @@
+# Declare parameters whcih will be imported from network-params.json file - 
 Parameters:
   EnvironmentName:
     Description: Environment Name for Web App project
     Type: String
 
   VpcCIDR:
-    Description: IP range for Vpc CIDR
+    Description: IP range for VPC CIDR
     Type: String
 
   Private1CIDR:
@@ -23,6 +24,7 @@ Parameters:
     Description: IP range for public2 Subnet CIDR
     Type: String
 
+# Declare Network Infrastructure - 
 Resources:
   # - Create a Virtual Public Cloud where all subnets & instances will live -
   VPC:
@@ -33,10 +35,12 @@ Resources:
         - Key: Name
           Value: !Ref EnvironmentName
 
+
   # - Create two public Subnets in two AZs
   # - These public subnets will be used for creating Load Balanced
   #   traffic. All EC2 instances will be in Private Subnet and a load
   #   balancer residing in public subnet will talk to those instances.
+  #   Nat Gateway and Internet Gatway will reside in public subnet.
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -79,7 +83,9 @@ Resources:
       - Key: Name
         Value: !Sub ${EnvironmentName}-Private2
 
-  #Attaching internet Gateway to Public subnet
+
+  # Create and attach Internet Gateway to Public subnets
+  # This IG will be used to talk to outside network.
   WebAppInternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -93,7 +99,9 @@ Resources:
       InternetGatewayId: !Ref WebAppInternetGateway
       VpcId: !Ref VPC
 
-  #Creating Route Tables - 
+
+  # Create Route Tables for Routing traffic from outside world
+  # to load balancers and EC2 instances -  
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -121,6 +129,9 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet2
 
+
+  # Create Nat gateways for instances in Private Subnet to talk to 
+  # load balancer
   NatGateway1EIP:
     Type: AWS::EC2::EIP
     DependsOn: IGatewayAttach
