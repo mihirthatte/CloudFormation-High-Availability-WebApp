@@ -46,7 +46,7 @@ Resources:
     Properties:
       AssociatePublicIpAddress: true
       ImageId: ami-005bdb005fb00e791
-      InstanceType: t2.medium
+      InstanceType: t3a.small
       IamInstanceProfile:
         Ref: "IAMProfile"
       BlockDeviceMappings: 
@@ -105,6 +105,21 @@ Resources:
       LoadBalancerArn: !Ref WebAppLB
       Port: 80
       Protocol: HTTP
+
+  ListenerRule:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref WebAppTargetGroup
+      Conditions:
+        - Field: http-header
+          HttpHeaderConfig:
+            HttpHeaderName: User-Agent
+            Values:
+              - Chrome
+      ListenerArn: !Ref WebAppLBListener
+      Priority: 1
 
   #Finally create an auto scaling group to launch your EC2 instances -
   WebAppAutoScale:
